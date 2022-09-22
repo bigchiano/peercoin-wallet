@@ -1,7 +1,10 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
+import bitcore from "bitcore-lib";
 
 function App() {
+  console.log(bitcore.Networks.defaultNetwork);
+  
   return (
     <div className="App">
       <header className="App-header">
