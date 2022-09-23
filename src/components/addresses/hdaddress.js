@@ -27,7 +27,7 @@ function HdAddress() {
 
   return (
     <>
-      <div class="tab-pane tab-content" id="newHDaddress">
+      <div className="tab-pane tab-content" id="newHDaddress">
         <h2>
           New HD Address <small>making bip32 even easier</small>
         </h2>
@@ -37,38 +37,38 @@ function HdAddress() {
         </p>
 
         <label>xPub Address</label>
-        <div class="input-group">
+        <div className="input-group">
           <input
             id="newHDxpub"
             type="text"
-            class="form-control"
+            className="form-control"
             value=""
             readOnly
           />
-          <span class="input-group-btn">
-            <button class="deriveHDbtn btn btn-default" type="button">
+          <span className="input-group-btn">
+            <button className="deriveHDbtn btn btn-default" type="button">
               <span
                 title="Derive from key"
-                class="glyphicon glyphicon-chevron-right"
+                className="glyphicon glyphicon-chevron-right"
               ></span>
             </button>
           </span>
         </div>
 
         <label>xPrv Address</label>
-        <div class="input-group">
+        <div className="input-group">
           <input
             id="newHDxprv"
             type="text"
-            class="form-control"
+            className="form-control"
             value=""
             readOnly
           />
-          <span class="input-group-btn">
-            <button class="deriveHDbtn btn btn-default" type="button">
+          <span className="input-group-btn">
+            <button className="deriveHDbtn btn btn-default" type="button">
               <span
                 title="Derive from key"
-                class="glyphicon glyphicon-chevron-right"
+                className="glyphicon glyphicon-chevron-right"
               ></span>
             </button>
           </span>
@@ -80,21 +80,21 @@ function HdAddress() {
           master addresses.
         </p>
 
-        <div class="checkbox">
+        <div className="checkbox">
           <label>
             <input
               type="checkbox"
               id="newHDBrainwallet"
-              class="checkbox-inline"
+              className="checkbox-inline"
             />{" "}
             Custom Seed or Brain Wallet
           </label>
-          <input type="text" class="form-control hidden" id="HDBrainwallet" />
+          <input type="text" className="form-control hidden" id="HDBrainwallet" />
         </div>
 
         <input
           type="button"
-          class="btn btn-primary"
+          className="btn btn-primary"
           value="Generate"
           id="newHDKeysBtn"
         />

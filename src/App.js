@@ -5,12 +5,14 @@ import Home from "./pages/index";
 import Transaction from "./pages/transaction";
 import Verify from "./pages/verify";
 import Sign from "./pages/sign";
+import BroadCast from "./pages/broadcast";
 
 function App() {
   return (
     <BrowserRouter>
       <Layout>
         <Routes>
+          <Route path="/broadcast" element={<BroadCast />} />
           <Route path="/sign" element={<Sign />} />
           <Route path="/verify" element={<Verify />} />
           <Route path="/address/*" element={<Address />} />

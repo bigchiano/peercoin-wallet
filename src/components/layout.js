@@ -6,11 +6,11 @@ function Layout({ children }) {
       <div id="wrap">
         <Header />
         <div id="content" className="container">
-          <div class="tab-content">
+          <div className="tab-content">
             {children}
 
             <br />
-            <p class="text-muted">
+            <p className="text-muted">
               This page uses javascript to generate your addresses and sign your
               transactions within your browser, this means we <i>never</i>{" "}
               receive your private keys, this can be independently verified by
@@ -37,7 +37,7 @@ function Layout({ children }) {
           <p className="text-muted">
             Donations accepted{" "}
             <a
-              onclick="$('#verifyScript').val('02be1bddb4fbeb12db49d6ca5fb70a5e99936352647f1a9c4c4af4b091dfbc39f7');$('#verifyBtn').click();"
+              // onClick="$('#verifyScript').val('02be1bddb4fbeb12db49d6ca5fb70a5e99936352647f1a9c4c4af4b091dfbc39f7');$('#verifyBtn').click();"
               href="#verify"
             >
               here
