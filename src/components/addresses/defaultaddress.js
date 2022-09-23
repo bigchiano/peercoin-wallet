@@ -1,4 +1,4 @@
-import bitcore from "../utils/core";
+import bitcore from "../../utils/core";
 
 function GenerateAddress() {
   let address;
