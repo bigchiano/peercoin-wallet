@@ -1,4 +1,5 @@
 import Header from "./header";
+import Modals from "./modals";
 
 function Layout({ children }) {
   return (
@@ -45,6 +46,8 @@ function Layout({ children }) {
           </p>
         </div>
       </div>
+
+      <Modals />
     </>
   );
 }
