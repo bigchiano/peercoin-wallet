@@ -1,29 +1,22 @@
+import { useState } from "react";
 import bitcore from "../../utils/core";
 
 function GenerateAddress() {
-  let address;
-  let pubKey;
-  let privKeyWif;
-  let privKeyHex;
+  const [address, setAddress] = useState("");
+  const [pubKey, setPubKey] = useState("");
+  const [privKeyWif, setPrivKeyWif] = useState("");
+  const [privKeyHex, setPrivKeyHex] = useState("");
 
-  //   console.log(bitcore.Networks.defaultNetwork);
-  const privateKey = new bitcore.PrivateKey();
-  //   privateKey.compressed = false
-  const privateKeyWif = privateKey.toWIF();
-  const publicKey = privateKey.toPublicKey();
+  const generateAddress = () => {
+    const privateKey = new bitcore.PrivateKey();
+    const privateKeyWif = privateKey.toWIF();
+    const publicKey = privateKey.toPublicKey();
 
-  address = publicKey.toAddress().toString();
-  pubKey = publicKey.toString();
-  privKeyWif = privateKeyWif.toString();
-  privKeyHex = privateKey.toString();
-
-  console.log(privateKey);
-  console.log({
-    address,
-    pubKey,
-    privKeyWif,
-    privKeyHex,
-  });
+    setAddress(publicKey.toAddress().toString());
+    setPubKey(publicKey.toString());
+    setPrivKeyWif(privateKeyWif.toString());
+    setPrivKeyHex(privateKey.toString());
+  };
 
   return (
     <>
@@ -42,7 +35,7 @@ function GenerateAddress() {
             id="newGeneratedAddress"
             type="text"
             className="form-control address"
-            value=""
+            value={address}
             readOnly
           />
           <span className="input-group-btn">
@@ -57,14 +50,20 @@ function GenerateAddress() {
           </span>
         </div>
         <label>Public key</label>
-        <input id="newPubKey" type="text" className="form-control" readOnly />
+        <input
+          id="newPubKey"
+          type="text"
+          value={pubKey}
+          className="form-control"
+          readOnly
+        />
         <label>Private key (WIF key)</label>
         <div className="input-group">
           <input
             id="newPrivKeyWif"
             type="password"
             className="form-control"
-            value=""
+            value={privKeyWif}
             readOnly
           />
           <span className="input-group-btn">
@@ -80,7 +79,7 @@ function GenerateAddress() {
             id="newPrivKeyEnc"
             type="text"
             className="form-control"
-            value=""
+            value={privKeyWif}
             readOnly
           />
         </div>
@@ -91,7 +90,7 @@ function GenerateAddress() {
             id="newPrivKey"
             type="password"
             className="form-control"
-            value=""
+            value={privKeyHex}
             readOnly
           />
           <span className="input-group-btn">
@@ -106,7 +105,7 @@ function GenerateAddress() {
           You can use the advanced options below to generate different kind of
           keys and addresses.
         </p>
-        <div className="checkbox">
+        {/* <div className="checkbox">
           <label>
             <input
               type="checkbox"
@@ -116,7 +115,7 @@ function GenerateAddress() {
             />{" "}
             Compress <span className="text-muted">(recommended)</span>
           </label>
-        </div>
+        </div> */}
 
         <div className="checkbox">
           <label>
@@ -184,6 +183,7 @@ function GenerateAddress() {
         </div>
         <div className="btn-group">
           <input
+            onClick={generateAddress}
             type="button"
             className="btn btn-primary"
             value="Generate"
