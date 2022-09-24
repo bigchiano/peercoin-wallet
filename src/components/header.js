@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Header() {
   return (
     <div id="header" className="navbar navbar-default " role="navigation">
@@ -22,7 +24,7 @@ function Header() {
           <ul className="nav navbar-nav">
             <li className="dropdown">
               <a
-                href="/address"
+                href="!#"
                 className="dropdown-toggle"
                 data-toggle="dropdown"
               >
@@ -31,68 +33,56 @@ function Header() {
               </a>
               <ul className="dropdown-menu">
                 <li>
-                  <a href="/address" data-toggle="tab">
-                    Address
-                  </a>
+                  <Link to="/address">Address</Link>
                 </li>
                 <li>
-                  <a href="#newSegWit" data-toggle="tab">
-                    SegWit Address
-                  </a>
+                  <Link to="/address/sigwit">SegWit Address</Link>
                 </li>
                 <li>
-                  <a href="#newMultiSig" data-toggle="tab">
-                    MultiSig Address
-                  </a>
+                  <Link to="/address/multisig">MultiSig Address</Link>
                 </li>
                 <li>
-                  <a href="#newTimeLocked" data-toggle="tab">
-                    Time Locked Address
-                  </a>
+                  <Link to="/address/timelocked">Time Locked Address</Link>
                 </li>
                 <li>
-                  <a href="#newHDaddress" data-toggle="tab">
-                    HD Address
-                  </a>
+                  <Link to="/address/hdwallet">HD Address</Link>
                 </li>
                 <li className="divider"></li>
                 <li>
-                  <a href="#newTransaction" data-toggle="tab">
-                    Transaction
-                  </a>
+                  <Link to="/transaction">Transaction</Link>
                 </li>
               </ul>
             </li>
             <li>
-              <a href="#verify" data-toggle="tab">
+              <Link to="/verify">
                 <span className="glyphicon glyphicon-ok"></span> Verify
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#sign" data-toggle="tab">
+              <Link to="/sign">
                 <span className="glyphicon glyphicon-pencil"></span> Sign
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#broadcast" data-toggle="tab">
+              <Link to="/broadcast">
                 <span className="glyphicon glyphicon-globe"></span> Broadcast
-              </a>
+              </Link>
             </li>
             <li className="hidden">
-              <a href="#wallet" data-toggle="tab">
+              <a href="#wallet">
                 <span className="glyphicon glyphicon-briefcase"></span> Wallet
               </a>
             </li>
             <li>
-              <a href="#about" data-toggle="tab">
+              <Link to="/about">
                 <span className="glyphicon glyphicon-info-sign"></span> About
-              </a>
+              </Link>
             </li>
 
             <li>
-              <a href="#settings" data-toggle="tab">
+              <Link to="/settings">
                 <span className="glyphicon glyphicon-cog"></span> Settings
-              </a>
+              </Link>
             </li>
           </ul>
           <ul className="nav navbar-right">
@@ -104,7 +94,8 @@ function Header() {
                   lineHeight: "20px",
                 }}
               >
-                <span>Change mode</span> :<select id="coinSelector"></select>
+                <span>Peercoin Mainnet</span>
+                {/* :<select id="coinSelector"></select> */}
               </div>
             </li>
           </ul>
