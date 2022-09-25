@@ -3,8 +3,9 @@ import {
   HDPrivateKey,
   PrivateKey,
   PublicKey,
-  Script
+  Script,
 } from "bitcore-lib";
+import bitcore from "./core";
 
 export const genAddressKeys = () => {
   const privateKey = new PrivateKey();
@@ -19,8 +20,11 @@ export const genAddressKeys = () => {
   };
 };
 
-export const genHDAddress = (seed) => {
-  const hdPrivateKey = new HDPrivateKey();
+export const genHDAddress = (seed = '') => {
+  const value = Buffer.from(seed);
+  const hash = bitcore.crypto.Hash.sha256(value);
+  const hdPrivateKey = seed ? new HDPrivateKey.fromSeed(hash) : new HDPrivateKey()
+
   return {
     publicAddress: hdPrivateKey.xpubkey,
     privateKey: hdPrivateKey.xprivkey,

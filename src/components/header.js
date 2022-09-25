@@ -35,22 +35,22 @@ function Header() {
                 <li>
                   <Link to="/address">Address</Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link to="/address/sigwit">SegWit Address</Link>
-                </li>
+                </li> */}
                 <li>
                   <Link to="/address/multisig">MultiSig Address</Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link to="/address/timelocked">Time Locked Address</Link>
-                </li>
+                </li> */}
                 <li>
                   <Link to="/address/hdwallet">HD Address</Link>
                 </li>
                 <li className="divider"></li>
-                <li>
+                {/* <li>
                   <Link to="/transaction">Transaction</Link>
-                </li>
+                </li> */}
               </ul>
             </li>
             <li>
