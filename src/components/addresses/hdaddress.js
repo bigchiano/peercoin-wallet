@@ -7,8 +7,8 @@ function HdAddress() {
   const [seed, setSeed] = useState("");
   const [showSeed, setShowSeed] = useState(false);
 
-  const generateAddress = (seed) => {
-    const { publicAddress, privateKey } = genHDAddress(seed);
+  const generateAddress = (useSeed) => {
+    const { publicAddress, privateKey } = genHDAddress(useSeed);
     setPubKey(publicAddress);
     setPrivKey(privateKey);
   };
@@ -73,7 +73,7 @@ function HdAddress() {
             <input
               onClick={() => setShowSeed(!showSeed)}
               type="checkbox"
-              value={showSeed}
+              checked={showSeed}
               id="newHDBrainwallet"
               className="checkbox-inline"
             />{" "}

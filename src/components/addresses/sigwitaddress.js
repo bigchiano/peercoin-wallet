@@ -1,29 +1,23 @@
-import bitcore from "../../utils/core";
+import { useState } from "react";
+import { genSegWitAddr } from "../../utils/addresses";
 
-function SigWitAddress() {
-  let address;
-  let pubKey;
-  let privKeyWif;
-  let privKeyHex;
+function SegWitAddress() {
+  const [segWitAddr, setSegWitAddr] = useState("");
+  const [pubKey, setPubKey] = useState("");
+  const [privKeyWif, setPrivKeyWif] = useState("");
+  const [redeemScript, setRedeemScript] = useState("");
+  const [seed, setSeed] = useState("");
+  const [showSeed, setShowSeed] = useState(false);
+  const [bech32, setBech32] = useState(true);
 
-  //   console.log(bitcore.Networks.defaultNetwork);
-  const privateKey = new bitcore.PrivateKey();
-  //   privateKey.compressed = false
-  const privateKeyWif = privateKey.toWIF();
-  const publicKey = privateKey.toPublicKey();
-
-  address = publicKey.toAddress().toString();
-  pubKey = publicKey.toString();
-  privKeyWif = privateKeyWif.toString();
-  privKeyHex = privateKey.toString();
-
-  console.log(privateKey);
-  console.log({
-    address,
-    pubKey,
-    privKeyWif,
-    privKeyHex,
-  });
+  const generateSegWitAddress = (useSeed, useBech32) => {
+    const { segWitAddress, privateKeyWif, publicKey, redeemScript } =
+      genSegWitAddr(useSeed, useBech32);
+    setSegWitAddr(segWitAddress);
+    setPrivKeyWif(privateKeyWif);
+    setPubKey(publicKey);
+    setRedeemScript(redeemScript);
+  };
 
   return (
     <>
@@ -44,7 +38,7 @@ function SigWitAddress() {
             id="newSegWitAddress"
             type="text"
             className="form-control address"
-            value=""
+            value={segWitAddr}
             readOnly
           />
           <span className="input-group-btn">
@@ -65,10 +59,17 @@ function SigWitAddress() {
           type="text"
           className="form-control"
           readOnly
+          value={redeemScript}
         />
 
         <label>Public key</label>
-        <input id="newSegWitPubKey" type="text" className="form-control" readOnly />
+        <input
+          id="newSegWitPubKey"
+          type="text"
+          className="form-control"
+          readOnly
+          value={pubKey}
+        />
 
         <label>Private key (WIF key)</label>
         <div className="input-group">
@@ -76,7 +77,7 @@ function SigWitAddress() {
             id="newSegWitPrivKey"
             type="password"
             className="form-control"
-            value=""
+            value={privKeyWif}
             readOnly
           />
           <span className="input-group-btn">
@@ -95,14 +96,20 @@ function SigWitAddress() {
         <div className="checkbox">
           <label>
             <input
+              onClick={() => setBech32(!bech32)}
               type="checkbox"
               id="newSegWitBech32addr"
               className="checkbox-inline"
-              checked
-              onChange={() => {}}
+              
+              checked={bech32}
+
             />{" "}
             Enable{" "}
-            <a href="https://en.bitcoin.it/wiki/Bech32" target="_blank" rel="noreferrer">
+            <a
+              href="https://en.bitcoin.it/wiki/Bech32"
+              target="_blank"
+              rel="noreferrer"
+            >
               Bech32
             </a>
             ?
@@ -112,15 +119,23 @@ function SigWitAddress() {
         <div className="checkbox">
           <label>
             <input
+              onClick={() => setShowSeed(!showSeed)}
               type="checkbox"
               id="newSegWitBrainwallet"
               className="checkbox-inline"
+              checked={showSeed}
+
             />{" "}
             Custom Seed or Brain Wallet
           </label>
           <input
+            value={seed}
+            onChange={(e) => {
+              e.preventDefault();
+              setSeed(e.target.value);
+            }}
             type="text"
-            className="form-control hidden"
+            className={"form-control " + (!showSeed && " hidden")}
             id="brainwalletSegWit"
           />
         </div>
@@ -131,6 +146,7 @@ function SigWitAddress() {
             className="btn btn-primary"
             value="Generate"
             id="newSegWitKeysBtn"
+            onClick={() => generateSegWitAddress(seed, bech32)}
           />
           <button
             type="button"
@@ -163,4 +179,4 @@ function SigWitAddress() {
   );
 }
 
-export default SigWitAddress;
+export default SegWitAddress;

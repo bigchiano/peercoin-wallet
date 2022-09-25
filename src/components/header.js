@@ -35,9 +35,9 @@ function Header() {
                 <li>
                   <Link to="/address">Address</Link>
                 </li>
-                {/* <li>
+                <li>
                   <Link to="/address/sigwit">SegWit Address</Link>
-                </li> */}
+                </li>
                 <li>
                   <Link to="/address/multisig">MultiSig Address</Link>
                 </li>
