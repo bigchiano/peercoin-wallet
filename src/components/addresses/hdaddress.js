@@ -1,29 +1,17 @@
-import bitcore from "../../utils/core";
+import { useState } from "react";
+import { genHDAddress } from "../../utils/addresses";
 
 function HdAddress() {
-  let address;
-  let pubKey;
-  let privKeyWif;
-  let privKeyHex;
+  const [pubKey, setPubKey] = useState("");
+  const [privKey, setPrivKey] = useState("");
+  const [seed, setSeed] = useState("");
+  const [showSeed, setShowSeed] = useState(false);
 
-  //   console.log(bitcore.Networks.defaultNetwork);
-  const privateKey = new bitcore.PrivateKey();
-  //   privateKey.compressed = false
-  const privateKeyWif = privateKey.toWIF();
-  const publicKey = privateKey.toPublicKey();
-
-  address = publicKey.toAddress().toString();
-  pubKey = publicKey.toString();
-  privKeyWif = privateKeyWif.toString();
-  privKeyHex = privateKey.toString();
-
-  console.log(privateKey);
-  console.log({
-    address,
-    pubKey,
-    privKeyWif,
-    privKeyHex,
-  });
+  const generateAddress = (seed) => {
+    const { publicAddress, privateKey } = genHDAddress(seed);
+    setPubKey(publicAddress);
+    setPrivKey(privateKey);
+  };
 
   return (
     <>
@@ -42,7 +30,7 @@ function HdAddress() {
             id="newHDxpub"
             type="text"
             className="form-control"
-            value=""
+            value={pubKey}
             readOnly
           />
           <span className="input-group-btn">
@@ -61,7 +49,7 @@ function HdAddress() {
             id="newHDxprv"
             type="text"
             className="form-control"
-            value=""
+            value={privKey}
             readOnly
           />
           <span className="input-group-btn">
@@ -83,16 +71,31 @@ function HdAddress() {
         <div className="checkbox">
           <label>
             <input
+              onClick={() => setShowSeed(!showSeed)}
               type="checkbox"
+              value={showSeed}
               id="newHDBrainwallet"
               className="checkbox-inline"
             />{" "}
             Custom Seed or Brain Wallet
           </label>
-          <input type="text" className="form-control hidden" id="HDBrainwallet" />
+          <input
+            value={seed}
+            onChange={(e) => {
+              e.preventDefault();
+              setSeed(e.target.value);
+            }}
+            type="text"
+            className={"form-control " + (!showSeed && " hidden") }
+            id="HDBrainwallet"
+          />
         </div>
 
         <input
+          onClick={(e) => {
+            e.preventDefault();
+            generateAddress(seed);
+          }}
           type="button"
           className="btn btn-primary"
           value="Generate"

@@ -1,4 +1,10 @@
-import { Address, PrivateKey, PublicKey, Script } from "bitcore-lib";
+import {
+  Address,
+  HDPrivateKey,
+  PrivateKey,
+  PublicKey,
+  Script
+} from "bitcore-lib";
 
 export const genAddressKeys = () => {
   const privateKey = new PrivateKey();
@@ -10,6 +16,14 @@ export const genAddressKeys = () => {
     publicKey: publicKey.toString(),
     privateKeyWif: privateKeyWif.toString(),
     privateKeyHex: privateKey.toString(),
+  };
+};
+
+export const genHDAddress = (seed) => {
+  const hdPrivateKey = new HDPrivateKey();
+  return {
+    publicAddress: hdPrivateKey.xpubkey,
+    privateKey: hdPrivateKey.xprivkey,
   };
 };
 
