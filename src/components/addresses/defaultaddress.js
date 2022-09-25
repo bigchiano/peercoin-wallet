@@ -1,5 +1,5 @@
 import { useState } from "react";
-import bitcore from "../../utils/core";
+import { genAddressKeys } from "../../utils/addresses";
 
 function GenerateAddress() {
   const [address, setAddress] = useState("");
@@ -8,14 +8,13 @@ function GenerateAddress() {
   const [privKeyHex, setPrivKeyHex] = useState("");
 
   const generateAddress = () => {
-    const privateKey = new bitcore.PrivateKey();
-    const privateKeyWif = privateKey.toWIF();
-    const publicKey = privateKey.toPublicKey();
+    const { address, publicKey, privateKeyWif, privateKeyHex } =
+      genAddressKeys();
 
-    setAddress(publicKey.toAddress().toString());
-    setPubKey(publicKey.toString());
-    setPrivKeyWif(privateKeyWif.toString());
-    setPrivKeyHex(privateKey.toString());
+    setAddress(address);
+    setPubKey(publicKey);
+    setPrivKeyWif(privateKeyWif);
+    setPrivKeyHex(privateKeyHex);
   };
 
   return (

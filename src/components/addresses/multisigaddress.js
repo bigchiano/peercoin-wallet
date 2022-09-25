@@ -1,29 +1,73 @@
-import bitcore from "../../utils/core";
+import { useState } from "react";
+import { genMultiSigAddress, isValidAddress } from "../../utils/addresses";
 
 function MultiSigAddress() {
-  let address;
-  let pubKey;
-  let privKeyWif;
-  let privKeyHex;
+  const [address, setAddress] = useState("");
+  const [redeemScript, setRedeemScript] = useState("");
+  const [pubAddresses, setPubAddresses] = useState(["undefined"]);
+  const [requiredSigCount, setRequiredSigCount] = useState(1);
+  const [error, setError] = useState("");
 
-  //   console.log(bitcore.Networks.defaultNetwork);
-  const privateKey = new bitcore.PrivateKey();
-  //   privateKey.compressed = false
-  const privateKeyWif = privateKey.toWIF();
-  const publicKey = privateKey.toPublicKey();
+  const addAddress = (addrs) => {
+    const newAddrs = [...addrs];
+    setPubAddresses([...newAddrs, "undefined"]);
+    setAddress("");
+    setRedeemScript("");
+  };
 
-  address = publicKey.toAddress().toString();
-  pubKey = publicKey.toString();
-  privKeyWif = privateKeyWif.toString();
-  privKeyHex = privateKey.toString();
+  const removeAddress = (addrs, index) => {
+    const newAddrs = [...addrs];
 
-  console.log(privateKey);
-  console.log({
-    address,
-    pubKey,
-    privKeyWif,
-    privKeyHex,
-  });
+    if (index > -1) {
+      if (index === 0 && newAddrs.length === 1) {
+        newAddrs[index] = "undefined";
+        setPubAddresses(newAddrs);
+      } else {
+        newAddrs.splice(index, 1);
+        setPubAddresses(newAddrs);
+      }
+    }
+    setAddress("");
+    setRedeemScript("");
+  };
+
+  const updateAddress = (addrs, index, value) => {
+    const newAddrs = [...addrs];
+    newAddrs[index] = value;
+    setPubAddresses(newAddrs);
+    setAddress("");
+    setRedeemScript("");
+  };
+
+  const generateAddress = (addrs, sigCount) => {
+    setAddress("");
+    setRedeemScript("");
+    setError("");
+    let isValid = true;
+
+    const validAddrs = addrs.filter((addr) => addr !== "undefined");
+    for (let index = 0; index < validAddrs.length; index++) {
+      const element = validAddrs[index];
+      if (!element || !isValidAddress(element)) {
+        isValid = false;
+        setError("One or more public key is invalid!");
+        return;
+      }
+    }
+
+    if (Number(sigCount) > validAddrs.length || validAddrs.length < 1) {
+      isValid = false;
+      setError(
+        "Minimum signatures required is greater than the amount of public keys provided"
+      );
+      return;
+    }
+
+    if (!isValid) return;
+    const { address, redeemScript } = genMultiSigAddress(validAddrs, sigCount);
+    setAddress(address);
+    setRedeemScript(redeemScript);
+  };
 
   const onOpenLink = (url) => {
     window.open(url, "_blank");
@@ -101,59 +145,86 @@ function MultiSigAddress() {
               </tr>
             </thead>
             <tbody className="list sort">
-              <tr className="item" style={{ width: "100%" }}>
-                <td>
-                  <a href="!#" className="handle">
-                    <span className="glyphicon glyphicon-move"></span>
-                  </a>
-                </td>
-                <td className="col-sm-7">
-                  <input type="text" className="form-control pubkey" />
-                </td>
-                <td className="col-sm-4">
-                  <input type="text" className="form-control id" readOnly />
-                </td>
-                <td>
-                  <a href="!#" className="pubkeyAdd">
-                    <span className="glyphicon glyphicon-plus"></span>
-                  </a>
-                  <a href="!#" className="pubkeyRemove">
-                    <span className="glyphicon glyphicon-minus"></span>
-                  </a>
-                </td>
-              </tr>
+              {pubAddresses.map((val, index) => {
+                return (
+                  <tr className="item" style={{ width: "100%" }} key={index}>
+                    <td>
+                      <a href="!#" className="handle">
+                        <span className="glyphicon glyphicon-move"></span>
+                      </a>
+                    </td>
+                    <td className="col-sm-7">
+                      <input
+                        type="text"
+                        className="form-control pubkey"
+                        value={val === "undefined" ? "" : val}
+                        onChange={(e) =>
+                          updateAddress(pubAddresses, index, e.target.value)
+                        }
+                      />
+                    </td>
+                    <td className="col-sm-4">
+                      <input type="text" className="form-control id" readOnly />
+                    </td>
+                    <td>
+                      <a
+                        href="!#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          addAddress(pubAddresses);
+                        }}
+                        className="pubkeyAdd"
+                      >
+                        <span className="glyphicon glyphicon-plus"></span>
+                      </a>
+                      <a
+                        href="!#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          removeAddress(pubAddresses, index);
+                        }}
+                        className="pubkeyRemove"
+                      >
+                        <span className="glyphicon glyphicon-minus"></span>
+                      </a>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
         <p>Enter the amount of signatures required to release the coins</p>
         <div className="row">
           <div className="col-xs-3">
-            <select id="releaseCoins" className="form-control">
-              <option>1</option>
-              <option defaultValue>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
-              <option>6</option>
-              <option>7</option>
-              <option>8</option>
-              <option>9</option>
-              <option>10</option>
-              <option>11</option>
-              <option>12</option>
-              <option>13</option>
-              <option>14</option>
-              <option>15</option>
+            <select
+              id="releaseCoins"
+              className="form-control"
+              defaultValue={requiredSigCount}
+              onChange={(e) => {
+                e.preventDefault();
+                setRequiredSigCount(e.target.value);
+              }}
+            >
+              {[...Array(15)].map((val, index) => {
+                return <option key={index}>{index + 1}</option>;
+              })}
             </select>
           </div>
         </div>
         <br />
+        {error && (
+          <div id="multiSigErrorMsg" className="alert alert-danger">
+            <span className="glyphicon glyphicon-exclamation-sign"></span>{" "}
+            {error}
+          </div>
+        )}
         <div
-          id="multiSigErrorMsg"
-          className="alert alert-danger"
-          style={{ display: "none" }}
-        ></div>
-        <div className="alert alert-success hidden" id="multiSigData">
+          className={
+            "alert alert-success " + (!address && !redeemScript && " hidden")
+          }
+          id="multiSigData"
+        >
           <label>Address</label>
           <p>Payment should be made to this address:</p>
           <div className="row">
@@ -162,7 +233,7 @@ function MultiSigAddress() {
                 <input
                   type="text"
                   className="form-control address"
-                  value=""
+                  value={address}
                   readOnly
                 />
                 <span className="input-group-btn">
@@ -192,11 +263,23 @@ function MultiSigAddress() {
             className="form-control script"
             style={{ height: "160px" }}
             readOnly
+            value={redeemScript}
           ></textarea>
           <label>Shareable URL</label>
-          <input type="text" className="scriptUrl form-control" readOnly />
+          <input
+            value={
+              window.location.origin.toString() + "/verify?" + redeemScript
+            }
+            type="text"
+            className="scriptUrl form-control"
+            readOnly
+          />
         </div>
         <input
+          onClick={(e) => {
+            e.preventDefault();
+            generateAddress(pubAddresses, requiredSigCount);
+          }}
           type="button"
           className="btn btn-primary"
           value="Submit"
