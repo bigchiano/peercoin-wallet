@@ -75,7 +75,7 @@ function SegWitAddress() {
         <div className="input-group">
           <input
             id="newSegWitPrivKey"
-            type="password"
+            type="text"
             className="form-control"
             value={privKeyWif}
             readOnly

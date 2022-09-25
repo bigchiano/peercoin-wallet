@@ -60,7 +60,7 @@ function GenerateAddress() {
         <div className="input-group">
           <input
             id="newPrivKeyWif"
-            type="password"
+            type="text"
             className="form-control"
             value={privKeyWif}
             readOnly
@@ -87,7 +87,8 @@ function GenerateAddress() {
         <div className="input-group">
           <input
             id="newPrivKey"
-            type="password"
+            // type="password"
+            type="text"
             className="form-control"
             value={privKeyHex}
             readOnly
