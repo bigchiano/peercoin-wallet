@@ -59,7 +59,17 @@ export const genSegWitAddr = (seed = "", bech32 = false) => {
   const type = bech32 ? "witnesspubkeyhash" : "scripthash";
   const address = new Address(publicKey, bitcore.Networks.peercoin, type);
   const scriptBuild = new Script.fromAddress(address);
-  const redeemScript = scriptBuild.toHex().slice(4);
+  let redeemScript = scriptBuild.toHex();
+
+  if (!bech32) {
+    const address_ = new Address(
+      publicKey,
+      bitcore.Networks.peercoin,
+      "witnesspubkeyhash"
+    );
+    const scriptBuild_ = new Script.fromAddress(address_);
+    redeemScript = scriptBuild_.toHex();
+  }
 
   return {
     segWitAddress: address.toString(),
