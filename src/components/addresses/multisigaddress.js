@@ -285,14 +285,14 @@ function MultiSigAddress() {
           value="Submit"
           id="newMultiSigAddress"
         />
-        Or
+        {/* Or
         <button
           className="btn btn-info"
           type="button"
           id="newMultiSigAddressSort"
         >
           <span>Sort by pubkey</span>
-        </button>
+        </button> */}
         <br />
       </div>
     </>

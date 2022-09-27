@@ -1,29 +1,22 @@
-import bitcore from "../../utils/core";
+import { useState } from "react";
+import { genTimeLockAddress } from "../../utils/addresses";
 
 function TimeLockedAddress() {
-  let address;
-  let pubKey;
-  let privKeyWif;
-  let privKeyHex;
+  const [address, setAddress] = useState("");
+  const [redeemScript, setRedeemScript] = useState("");
+  const [pubKey, setPubKey] = useState("");
+  const [lockByBlock, setLockByBlock] = useState(false);
+  const [blockHeight, setBlockHeight] = useState("");
 
-  //   console.log(bitcore.Networks.defaultNetwork);
-  const privateKey = new bitcore.PrivateKey();
-  //   privateKey.compressed = false
-  const privateKeyWif = privateKey.toWIF();
-  const publicKey = privateKey.toPublicKey();
+  const generateAddress = (addr, timeOrBlock) => {
+    setAddress("");
+    setRedeemScript("");
 
-  address = publicKey.toAddress().toString();
-  pubKey = publicKey.toString();
-  privKeyWif = privateKeyWif.toString();
-  privKeyHex = privateKey.toString();
-
-  console.log(privateKey);
-  console.log({
-    address,
-    pubKey,
-    privKeyWif,
-    privKeyHex,
-  });
+    const { address: address_, redeemScript: redeemScript_ } =
+      genTimeLockAddress(addr, timeOrBlock);
+    setAddress(address_);
+    setRedeemScript(redeemScript_);
+  };
 
   return (
     <div className="tab-pane tab-content" id="newTimeLocked">
@@ -69,6 +62,11 @@ function TimeLockedAddress() {
               id="timeLockedPubKey"
               type="text"
               className="form-control pubkey"
+              value={pubKey}
+              onChange={(e) => {
+                e.preventDefault();
+                setPubKey(e.target.value);
+              }}
             />
           </div>
         </div>
@@ -80,9 +78,12 @@ function TimeLockedAddress() {
           type="radio"
           id="timeLockedRbTypeDate"
           name="timeLockedRbType"
-          value="date"
-          checked="checked"
-          onChange={() => {}}
+          value=" date"
+          checked={!lockByBlock}
+          onChange={(e) => {
+            setBlockHeight("");
+            setLockByBlock(false);
+          }}
         />
         <label htmlFor="timeLockedRbTypeDate">date and time</label>
         or
@@ -90,8 +91,12 @@ function TimeLockedAddress() {
           type="radio"
           id="timeLockedRbTypeBlockHeight"
           name="timeLockedRbType"
-          value="blockheight"
-          onChange={() => {}}
+          placeholder="blockheight"
+          checked={lockByBlock}
+          onChange={(e) => {
+            setBlockHeight("");
+            setLockByBlock(true);
+          }}
         />
         <label htmlFor="timeLockedRbTypeBlockHeight">blockheight</label>
         required to release the coins:
@@ -99,22 +104,40 @@ function TimeLockedAddress() {
       <div className="row">
         <div className="col-md-6">
           <div className="form-group">
-            <div className="input-group date" id="timeLockedDateTimePicker">
+            <div
+              className={"input-group date " + (lockByBlock && " hidden")}
+              id="timeLockedDateTimePicker"
+            >
               <input
                 type="text"
                 className="form-control"
                 placeholder="MM/DD/YYYY hh:mm"
+                onChange={(e) => {
+                  const date = Math.floor(
+                    new Date(e.target.value).getTime() / 1000
+                  );
+
+                  console.log(date);
+                  setBlockHeight(date);
+                }}
               />
               <span className="input-group-addon">
                 <span className="glyphicon glyphicon-calendar"></span>
               </span>
             </div>
-            <div className="input-group hidden" id="timeLockedBlockHeight">
+            <div
+              className={"input-group" + (!lockByBlock && " hidden")}
+              id="timeLockedBlockHeight"
+            >
               <input
                 type="text"
                 id="timeLockedBlockHeightVal"
                 className="form-control"
                 placeholder="Blockheight"
+                value={blockHeight}
+                onChange={(e) => {
+                  setBlockHeight(e.target.value);
+                }}
               />
             </div>
           </div>
@@ -129,7 +152,12 @@ function TimeLockedAddress() {
         style={{ display: "none" }}
       ></div>
 
-      <div className="alert alert-success hidden" id="timeLockedData">
+      <div
+        className={
+          "alert alert-success " + (!address && !redeemScript && " hidden")
+        }
+        id="timeLockedData"
+      >
         <label>Address</label>
         <p>Payment should be made to this address:</p>
         <div className="row">
@@ -138,8 +166,7 @@ function TimeLockedAddress() {
               <input
                 type="text"
                 className="form-control address"
-                value=""
-                onChange={() => {}}
+                value={address}
                 readOnly
               />
               <span className="input-group-btn">
@@ -169,9 +196,15 @@ function TimeLockedAddress() {
           className="form-control script"
           style={{ height: "160px" }}
           readOnly
+          value={redeemScript}
         ></textarea>
         <label>Shareable URL</label>
-        <input type="text" className="scriptUrl form-control" readOnly />
+        <input
+          type="text"
+          className="scriptUrl form-control"
+          readOnly
+          value={window.location.origin.toString() + "/verify?" + redeemScript}
+        />
       </div>
 
       <input
@@ -179,7 +212,7 @@ function TimeLockedAddress() {
         className="btn btn-primary"
         value="Submit"
         id="newTimeLockedAddress"
-        onChange={() => {}}
+        onClick={() => generateAddress(pubKey, blockHeight)}
       />
       <br />
     </div>

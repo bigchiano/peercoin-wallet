@@ -61,21 +61,38 @@ export const genSegWitAddr = (seed = "", bech32 = false) => {
   const scriptBuild = new Script.fromAddress(address);
   let redeemScript = scriptBuild.toHex();
 
-  if (!bech32) {
-    const address_ = new Address(
-      publicKey,
-      bitcore.Networks.peercoin,
-      "witnesspubkeyhash"
-    );
-    const scriptBuild_ = new Script.fromAddress(address_);
-    redeemScript = scriptBuild_.toHex();
-  }
+  // if (!bech32) {
+  //   const address_ = new Address(
+  //     publicKey,
+  //     bitcore.Networks.peercoin,
+  //     "witnesspubkeyhash"
+  //   );
+  //   const scriptBuild_ = new Script.fromAddress(address_);
+  //   redeemScript = scriptBuild_.toHex();
+  // }
 
   return {
     segWitAddress: address.toString(),
     privateKeyWif: privateKey.toWIF().toString(),
     publicKey: publicKey.toString(),
     redeemScript,
+  };
+};
+
+export const genTimeLockAddress = (pubkey, checklocktimeverify) => {
+  const address = new Address([pubkey], 1);
+  const pubKey = new PublicKey(pubkey).toBuffer();
+
+  const redeemScript = Script()
+    .add(Buffer.from(`${checklocktimeverify}`))
+    .add("OP_CHECKLOCKTIMEVERIFY") // OP_CHECKLOCKTIMEVERIFY
+    .add("OP_DROP") // OP_DROP
+    .add(pubKey) // Public Key
+    .add("OP_CHECKSIG"); // OP_CHECKSIG
+
+  return {
+    address: address.toString(),
+    redeemScript: redeemScript.toHex(),
   };
 };
 

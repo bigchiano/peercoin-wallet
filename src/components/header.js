@@ -41,9 +41,9 @@ function Header() {
                 <li>
                   <Link to="/address/multisig">MultiSig Address</Link>
                 </li>
-                {/* <li>
+                <li>
                   <Link to="/address/timelocked">Time Locked Address</Link>
-                </li> */}
+                </li>
                 <li>
                   <Link to="/address/hdwallet">HD Address</Link>
                 </li>
