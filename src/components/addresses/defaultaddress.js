@@ -6,10 +6,13 @@ function GenerateAddress() {
   const [pubKey, setPubKey] = useState("");
   const [privKeyWif, setPrivKeyWif] = useState("");
   const [privKeyHex, setPrivKeyHex] = useState("");
+  const [seed, setSeed] = useState("");
+  const [showSeed, setShowSeed] = useState(false);
 
-  const generateAddress = () => {
-    const { address, publicKey, privateKeyWif, privateKeyHex } =
-      genAddressKeys();
+  const generateAddress = (seed_) => {
+    const { address, publicKey, privateKeyWif, privateKeyHex } = genAddressKeys(
+      showSeed ? seed_ : ""
+    );
 
     setAddress(address);
     setPubKey(publicKey);
@@ -123,35 +126,46 @@ function GenerateAddress() {
               type="checkbox"
               id="newBrainwallet"
               className="checkbox-inline"
+              checked={showSeed}
+              onChange={() => setShowSeed(!showSeed)}
             />{" "}
-            Custom Seed, Brain Wallet or 64 char hex private key
+            {/* Custom Seed, Brain Wallet or  */}
+            64 char hex private key
           </label>
           <div
             id="keyFromData"
-            className="hidden"
+            className={"l " + (!showSeed && "hidden")}
             style={{ paddingLeft: "20px" }}
           >
-            <input type="text" className="form-control" id="brainwallet" />
-            <label>
+            <input
+              type="text"
+              className="form-control"
+              id="brainwallet"
+              value={seed}
+              onChange={(e) => setSeed(e.target.value)}
+            />
+            {/* <label>
               <input
                 type="checkbox"
                 id="brainwalletIsPrivKey"
                 className="checkbox-inline"
+                checked={showSeed}
+                onChange={(e) => setShowSeed(e.target.value)}
               />{" "}
               This is a 64 char hex private key
-            </label>
+            </label> */}
           </div>
         </div>
         <div className="checkbox">
-          <label>
+          {/* <label>
             <input
               type="checkbox"
               id="encryptKey"
               className="checkbox-inline"
             />{" "}
             Encrypt Private Key with AES-256 Password
-          </label>
-          <div id="aes256passform" className="row hidden">
+          </label> */}
+          {/* <div id="aes256passform" className="row hidden">
             <div className="col-md-6">
               <input
                 type="password"
@@ -168,9 +182,9 @@ function GenerateAddress() {
                 placeholder="Confirm Password"
               />
             </div>
-          </div>
+          </div> */}
 
-          <div id="aes256passStatus" className="row hidden">
+          {/* <div id="aes256passStatus" className="row hidden">
             <div className="col-md-12">
               <br />
               <div className="alert alert-danger">
@@ -179,11 +193,11 @@ function GenerateAddress() {
                 Your passwords do not match, please try again!
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
         <div className="btn-group">
           <input
-            onClick={generateAddress}
+            onClick={() => generateAddress(seed)}
             type="button"
             className="btn btn-primary"
             value="Generate"

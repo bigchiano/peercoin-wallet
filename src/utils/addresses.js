@@ -7,8 +7,8 @@ import {
 } from "bitcore-lib";
 import bitcore from "./core";
 
-export const genAddressKeys = () => {
-  const privateKey = new PrivateKey();
+export const genAddressKeys = (seed = "") => {
+  const privateKey = seed ? new PrivateKey(seed) : new PrivateKey();
   const privateKeyWif = privateKey.toWIF();
   const publicKey = privateKey.toPublicKey();
 
@@ -60,16 +60,6 @@ export const genSegWitAddr = (seed = "", bech32 = false) => {
   const address = new Address(publicKey, bitcore.Networks.peercoin, type);
   const scriptBuild = new Script.fromAddress(address);
   let redeemScript = scriptBuild.toHex();
-
-  // if (!bech32) {
-  //   const address_ = new Address(
-  //     publicKey,
-  //     bitcore.Networks.peercoin,
-  //     "witnesspubkeyhash"
-  //   );
-  //   const scriptBuild_ = new Script.fromAddress(address_);
-  //   redeemScript = scriptBuild_.toHex();
-  // }
 
   return {
     segWitAddress: address.toString(),

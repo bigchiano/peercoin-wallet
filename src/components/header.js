@@ -48,9 +48,9 @@ function Header() {
                   <Link to="/address/hdwallet">HD Address</Link>
                 </li>
                 <li className="divider"></li>
-                {/* <li>
+                <li>
                   <Link to="/transaction">Transaction</Link>
-                </li> */}
+                </li>
               </ul>
             </li>
             <li>
