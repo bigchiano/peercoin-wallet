@@ -1,7 +1,49 @@
+import { useMemo, useState } from "react";
+import { genAddrScriptHash } from "../utils/addresses";
+import { genTransaction, getUtxos } from "../utils/transaction";
+
 function Transaction() {
+  const [addr, setAddr] = useState("");
+  const [amount, setAmount] = useState(0.0);
+  const [receiverAddr, setReceiverAddr] = useState("");
+  const [inputs, setInputs] = useState([]);
+  const [tx, setTx] = useState("");
+
   const onOpenLink = (url) => {
     window.open(url, "_blank");
   };
+
+  const onLoadUtxo = async (addr) => {
+    const res = await getUtxos(addr);
+    setInputs(
+      res.map((i) => {
+        i.scriptPubKey = genAddrScriptHash(addr);
+        i.amount = Number(i.amount).toFixed(6);
+        return i;
+      })
+    );
+  };
+
+  const onGenTx = async (rAddr, sendAmount, utxos) => {
+    if (!rAddr || !sendAmount || utxos.length < 1) return;
+    const res = genTransaction(utxos, rAddr, sendAmount);
+    setTx(res);
+  };
+
+  const totalInput = useMemo(() => {
+    if (inputs.length > 0) {
+      return inputs
+        .reduce((partialSum, a) => partialSum + Number(a.amount), 0)
+        .toFixed(6);
+    }
+
+    return 0.0;
+  }, [inputs]);
+
+  const txFee = useMemo(() => {
+    const fee = (totalInput - amount).toFixed(6);
+    return fee > 0 ? fee : (0.0).toFixed(2);
+  }, [totalInput, amount]);
 
   return (
     <div>
@@ -23,9 +65,25 @@ function Transaction() {
               <span className="glyphicon glyphicon-camera"></span>
             </button>
           </span>
-          <input type="text" id="redeemFrom" className="form-control" value="" />
+          <input
+            type="text"
+            id="redeemFrom"
+            className="form-control"
+            value={addr}
+            onChange={(e) => {
+              setAddr(e.target.value);
+            }}
+          />
           <span className="input-group-btn">
-            <button id="redeemFromBtn" className="btn btn-info" type="button">
+            <button
+              id="redeemFromBtn"
+              className="btn btn-info"
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                onLoadUtxo(addr);
+              }}
+            >
               Load
             </button>
           </span>
@@ -53,6 +111,7 @@ function Transaction() {
                   id="clearInputsOnLoad"
                   className="checkbox-inline"
                   checked
+                  onChange={() => {}}
                 />{" "}
                 Clear existing inputs when new inputs are loaded.
               </label>
@@ -64,7 +123,11 @@ function Transaction() {
             </span>
             <p className="checkbox">
               <label>
-                <input type="checkbox" id="opReturn" className="checkbox-inline" />{" "}
+                <input
+                  type="checkbox"
+                  id="opReturn"
+                  className="checkbox-inline"
+                />{" "}
                 Allow data to be sent within the transaction and stored in the
                 blockchain by using{" "}
                 <a
@@ -86,14 +149,14 @@ function Transaction() {
                 />{" "}
                 As plain text{" "}
               </label>
-              <div id="opReturnMessage" className="text-muted">
+              <span id="opReturnMessage" className="text-muted">
                 When using this option you may enter a hex string or address
                 into the address field on the output tab.
-              </div>
-              <div id="opReturnTextMessage" className="text-muted hidden">
+              </span>
+              <span id="opReturnTextMessage" className="text-muted hidden">
                 When using this option you may enter a plain text string into
                 the address field on the output tab.
-              </div>
+              </span>
             </p>
             <hr />
             <label>Lock Time</label>
@@ -105,12 +168,24 @@ function Transaction() {
               indicates the earliest time a transaction can be added to the
               block chain.
             </p>
-            <input type="text" className="form-control" value="0" id="nLockTime" />
+            <input
+              type="text"
+              className="form-control"
+              value="0"
+              onChange={() => {}}
+              id="nLockTime"
+            />
             <hr />
             <div id="txTimeOptional">
               <label>Extra time field</label>
               <p>Indicates the timestamp of a transaction.</p>
-              <input type="text" className="form-control" value="0" id="nTime" />
+              <input
+                type="text"
+                className="form-control"
+                value="0"
+                onChange={() => {}}
+                id="nTime"
+              />
 
               <hr />
             </div>
@@ -128,7 +203,7 @@ function Transaction() {
             <a href="#txoutputs" data-toggle="tab">
               Outputs{" "}
               <small>
-                (<span id="totalOutput">0.00000000</span>)
+                (<span id="totalOutput">{(Number(amount) || 0).toFixed(6)}</span>)
               </small>
             </a>
           </li>
@@ -136,7 +211,7 @@ function Transaction() {
             <a href="#txinputs" data-toggle="tab">
               Inputs{" "}
               <small>
-                (<span id="totalInput">0.00000000</span>)
+                (<span id="totalInput">{totalInput}</span>)
               </small>
             </a>
           </li>
@@ -185,6 +260,8 @@ function Transaction() {
                     type="text"
                     className="form-control address"
                     placeholder=""
+                    value={receiverAddr}
+                    onChange={(e) => setReceiverAddr(e.target.value)}
                   />
                 </div>
                 <div className="col-xs-2">
@@ -192,6 +269,8 @@ function Transaction() {
                     type="text"
                     className="form-control amount"
                     placeholder="0.00"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
                   />
                 </div>
                 <div className="col-xs-5">
@@ -233,36 +312,53 @@ function Transaction() {
             </div>
 
             <div id="inputs">
-              <div className="row inputs">
-                <div className="col-xs-5">
-                  <input type="text" className="form-control txId" placeholder="" />
+              {inputs.map((input) => (
+                <div key={input.txid} className="row inputs">
+                  <div className="col-xs-5">
+                    <input
+                      type="text"
+                      className="form-control txId"
+                      placeholder=""
+                      value={input.txid}
+                      readOnly
+                    />
+                  </div>
+                  <div className="col-xs-1">
+                    <input
+                      type="text"
+                      className="form-control txIdN"
+                      placeholder="0"
+                      value={input.vout}
+                      readOnly
+                    />
+                  </div>
+                  <div className="col-xs-3">
+                    <input
+                      type="text"
+                      className="form-control txIdScript"
+                      value={input.scriptPubKey}
+                      readOnly
+                    />
+                  </div>
+                  <div className="col-xs-2">
+                    <input
+                      type="text"
+                      className="form-control txIdAmount"
+                      placeholder="0.00"
+                      value={input.amount}
+                      readOnly
+                    />
+                  </div>
+                  <div className="col-xs-1">
+                    <a href="!#" className="txidAdd">
+                      <span className="glyphicon glyphicon-plus"></span>
+                    </a>
+                    <a href="!#" className="txidRemove">
+                      <span className="glyphicon glyphicon-minus"></span>
+                    </a>
+                  </div>
                 </div>
-                <div className="col-xs-1">
-                  <input
-                    type="text"
-                    className="form-control txIdN"
-                    placeholder="0"
-                  />
-                </div>
-                <div className="col-xs-3">
-                  <input type="text" className="form-control txIdScript" />
-                </div>
-                <div className="col-xs-2">
-                  <input
-                    type="text"
-                    className="form-control txIdAmount"
-                    placeholder="0.00"
-                  />
-                </div>
-                <div className="col-xs-1">
-                  <a href="!#" className="txidAdd">
-                    <span className="glyphicon glyphicon-plus"></span>
-                  </a>
-                  <a href="!#" className="txidRemove">
-                    <span className="glyphicon glyphicon-minus"></span>
-                  </a>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -278,7 +374,7 @@ function Transaction() {
               type="text"
               id="transactionFee"
               className="form-control"
-              value="0.0000"
+              value={txFee}
               readOnly
             />
           </div>
@@ -288,51 +384,63 @@ function Transaction() {
           id="transactionCreateStatus"
           className="alert alert-danger hidden"
         ></div>
-        <div id="transactionCreate" className="alert alert-success hidden">
-          <label>Transaction</label>
-          <button
-            className="qrcodeBtn btn btn-default"
-            type="button"
-            data-toggle="modal"
-            data-target="#modalQrcode"
-            style={{ float: "right" }}
-          >
-            <span className="glyphicon glyphicon-qrcode"></span>
-          </button>
+        {tx && (
+          <div id="transactionCreate" className="alert alert-success">
+            <label>Transaction</label>
+            <button
+              className="qrcodeBtn btn btn-default"
+              type="button"
+              data-toggle="modal"
+              data-target="#modalQrcode"
+              style={{ float: "right" }}
+            >
+              <span className="glyphicon glyphicon-qrcode"></span>
+            </button>
 
-          <p>
-            The transaction below has been generated and encoded. It can be
-            broadcasted once it has been signed.
-          </p>
-          <br />
-          <textarea
-            className="form-control"
-            style={{ height: "150px" }}
-            readonly
-          ></textarea>
-          <div className="row">
-            <div className="col-md-12">
-              <p className="text-muted" style={{ float: "left" }}>
-                Size: <span className="txSize">0</span> <i>bytes</i>
-              </p>
-              <div style={{ float: "right", marginTop: "10px" }}>
-                If you are sure:
-                <button className="btn btn-info transactionToVerify" type="button">
-                  Continue to Verify
-                  <span className="glyphicon glyphicon-pencil"></span>
-                </button>
-                Or
-                <button className="btn btn-info transactionToSign" type="button">
-                  Continue to Sign
-                  <span className="glyphicon glyphicon-pencil"></span>
-                </button>
+            <p>
+              The transaction below has been generated and encoded. It can be
+              broadcasted once it has been signed.
+            </p>
+            <br />
+            <textarea
+              className="form-control"
+              style={{ height: "150px" }}
+              readOnly
+              value={tx}
+            ></textarea>
+            <div className="row">
+              <div className="col-md-12">
+                <p className="text-muted" style={{ float: "left" }}>
+                  Size: <span className="txSize">0</span> <i>bytes</i>
+                </p>
+                <div style={{ float: "right", marginTop: "10px" }}>
+                  If you are sure:
+                  <button
+                    className="btn btn-info transactionToVerify"
+                    type="button"
+                  >
+                    Continue to Verify
+                    <span className="glyphicon glyphicon-pencil"></span>
+                  </button>
+                  Or
+                  <button
+                    className="btn btn-info transactionToSign"
+                    type="button"
+                  >
+                    Continue to Sign
+                    <span className="glyphicon glyphicon-pencil"></span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
         <input
           type="button"
           value="Generate"
+          onClick={() => {
+            onGenTx(receiverAddr, amount, inputs);
+          }}
           className="btn btn-primary"
           id="transactionBtn"
         />

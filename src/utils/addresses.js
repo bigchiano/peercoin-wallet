@@ -5,7 +5,7 @@ import {
   PublicKey,
   Script,
 } from "bitcore-lib";
-import bitcore from "./core";
+import bitcore from "bitcore-lib";
 
 export const genAddressKeys = (seed = "") => {
   const privateKey = seed ? new PrivateKey(seed) : new PrivateKey();
@@ -67,6 +67,11 @@ export const genSegWitAddr = (seed = "", bech32 = false) => {
     publicKey: publicKey.toString(),
     redeemScript,
   };
+};
+
+export const genAddrScriptHash = (addr) => {
+  const scriptBuild = new Script.fromAddress(addr);
+  return scriptBuild.toHex();
 };
 
 export const genTimeLockAddress = (pubkey, checklocktimeverify) => {

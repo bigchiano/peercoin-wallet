@@ -1,3 +1,76 @@
+diff --git a/node_modules/bitcore-lib/index.js b/node_modules/bitcore-lib/index.js
+index 4cbe6bf..480cfad 100644
+--- a/node_modules/bitcore-lib/index.js
++++ b/node_modules/bitcore-lib/index.js
+@@ -5,6 +5,7 @@ var bitcore = module.exports;
+ // module information
+ bitcore.version = 'v' + require('./package.json').version;
+ bitcore.versionGuard = function(version) {
++  return
+   if (version !== undefined) {
+     var message = 'More than one instance of bitcore-lib found. ' +
+       'Please make sure to require bitcore-lib and check that submodules do' +
+diff --git a/node_modules/bitcore-lib/lib/networks.js b/node_modules/bitcore-lib/lib/networks.js
+index cb88005..34d003d 100644
+--- a/node_modules/bitcore-lib/lib/networks.js
++++ b/node_modules/bitcore-lib/lib/networks.js
+@@ -182,6 +182,42 @@ addNetwork({
+   ]
+ });
+ 
++addNetwork({
++  name: 'peercoin',
++  alias: 'ppcoin',
++  pubkeyhash: 0x37,
++  privatekey: 0xb7,
++  scripthash: 0x75,
++  bech32prefix: 'pc',
++  xpubkey: 0x0488b21e,
++  xprivkey: 0x0488ade4,
++  networkMagic: 0xe6e8e9e5,
++  port: 9901,
++  dnsSeeds: [
++    'seed.peercoin.net'
++  ]
++});
++
++var peercoin = get('peercoin');
++
++addNetwork({
++  name: 'peercoin-testnet',
++  alias: 'ppcoin-testnet',
++  pubkeyhash: 0x6f,
++  privatekey: 0xef,
++  scripthash: 0xc4,
++  bech32prefix: 'tpc',
++  xpubkey: 0x043587cf,
++  xprivkey: 0x04358394,
++  networkMagic: 0xcbf2c0ef,
++  port: 9903,
++  dnsSeeds: [
++    'tseed.peercoin.net'
++  ]
++});
++
++var peercointestnet = get('peercoin-testnet');
++
+ /**
+  * @instance
+  * @member Networks#testnet
+@@ -234,10 +270,12 @@ function disableRegtest() {
+ module.exports = {
+   add: addNetwork,
+   remove: removeNetwork,
+-  defaultNetwork: livenet,
++  defaultNetwork: peercoin,
+   livenet: livenet,
+   mainnet: livenet,
+   testnet: testnet,
++  peercoin: peercoin,
++  peercointestnet: peercointestnet,
+   regtest: regtest,
+   get: get,
+   enableRegtest: enableRegtest,
 diff --git a/node_modules/bitcore-lib/lib/script/script.js b/node_modules/bitcore-lib/lib/script/script.js
 index b86a2ef..ea76a82 100644
 --- a/node_modules/bitcore-lib/lib/script/script.js
