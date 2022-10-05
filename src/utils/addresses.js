@@ -1,11 +1,14 @@
 import {
   Address,
   HDPrivateKey,
+  Networks,
   PrivateKey,
   PublicKey,
   Script,
 } from "bitcore-lib";
 import bitcore from "bitcore-lib";
+
+bitcore.Networks.defaultNetwork = bitcore.Networks.get("peercoin-testnet");
 
 export const genAddressKeys = (seed = "") => {
   const privateKey = seed ? new PrivateKey(seed) : new PrivateKey();
@@ -92,9 +95,6 @@ export const genTimeLockAddress = (pubkey, checklocktimeverify) => {
 };
 
 export const isValidAddress = (addr) => {
-  try {
-    PublicKey(addr);
-    return true;
-  } catch (error) {}
+  if (Address.isValid(addr, Networks.testnet)) return true;
   return false;
 };

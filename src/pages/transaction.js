@@ -14,10 +14,12 @@ function Transaction() {
   };
 
   const onLoadUtxo = async (addr) => {
-    const res = await getUtxos(addr);
+    const { address, utxos } = await getUtxos(addr);
+    if (!address || !utxos) return;
+
     setInputs(
-      res.map((i) => {
-        i.scriptPubKey = genAddrScriptHash(addr);
+      utxos.map((i) => {
+        i.scriptPubKey = genAddrScriptHash(address);
         i.amount = Number(i.amount).toFixed(6);
         return i;
       })
@@ -203,7 +205,9 @@ function Transaction() {
             <a href="#txoutputs" data-toggle="tab">
               Outputs{" "}
               <small>
-                (<span id="totalOutput">{(Number(amount) || 0).toFixed(6)}</span>)
+                (
+                <span id="totalOutput">{(Number(amount) || 0).toFixed(6)}</span>
+                )
               </small>
             </a>
           </li>

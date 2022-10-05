@@ -23,11 +23,7 @@ function Header() {
         <div className="collapse navbar-collapse">
           <ul className="nav navbar-nav">
             <li className="dropdown">
-              <a
-                href="!#"
-                className="dropdown-toggle"
-                data-toggle="dropdown"
-              >
+              <a href="!#" className="dropdown-toggle" data-toggle="dropdown">
                 <span className="glyphicon glyphicon-plus"></span> New
                 <b className="caret"></b>
               </a>
@@ -94,7 +90,7 @@ function Header() {
                   lineHeight: "20px",
                 }}
               >
-                <span>Peercoin Mainnet</span>
+                <span>Peercoin Testnet</span>
                 {/* :<select id="coinSelector"></select> */}
               </div>
             </li>
