@@ -8,6 +8,7 @@ function Transaction() {
   const [receiverAddr, setReceiverAddr] = useState("");
   const [inputs, setInputs] = useState([]);
   const [tx, setTx] = useState("");
+  const [size, setSize] = useState("");
 
   const onOpenLink = (url) => {
     window.open(url, "_blank");
@@ -34,8 +35,9 @@ function Transaction() {
 
   const onGenTx = async (rAddr, sendAmount, utxos) => {
     if (!rAddr || !sendAmount || utxos.length < 1) return;
-    const res = genTransaction(utxos, rAddr, sendAmount);
-    setTx(res);
+    const { tx, size } = genTransaction(utxos, rAddr, sendAmount);
+    setTx(tx);
+    setSize(size);
   };
 
   const totalInput = useMemo(() => {
@@ -360,7 +362,7 @@ function Transaction() {
                     />
                   </div>
                   <div className="col-xs-1">
-                    <a
+                    {/* <a
                       href="!#"
                       onClick={(e) => {
                         e.preventDefault();
@@ -368,7 +370,7 @@ function Transaction() {
                       className="txidAdd"
                     >
                       <span className="glyphicon glyphicon-plus"></span>
-                    </a>
+                    </a> */}
                     <a
                       href="!#"
                       onClick={(e) => {
@@ -434,7 +436,7 @@ function Transaction() {
             <div className="row">
               <div className="col-md-12">
                 <p className="text-muted" style={{ float: "left" }}>
-                  Size: <span className="txSize">0</span> <i>bytes</i>
+                  Size: <span className="txSize">{size}</span> <i>bytes</i>
                 </p>
                 <div style={{ float: "right", marginTop: "10px" }}>
                   If you are sure:

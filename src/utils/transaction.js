@@ -1,7 +1,4 @@
-import bitcore, {
-  PrivateKey, Script,
-  Transaction
-} from "bitcore-lib";
+import bitcore, { PrivateKey, Script, Transaction } from "bitcore-lib";
 import { isValidAddress } from "./addresses";
 
 bitcore.Networks.defaultNetwork = bitcore.Networks.get("peercoin-testnet");
@@ -57,5 +54,5 @@ export const genTransaction = (utxos, toAddr, amount) => {
     .from(utxos)
     .to(toAddr, Number((amount * 1000000).toFixed(6)))
     .change(toAddr);
-  return tx.toString();
+  return { tx: tx.toString(), size: tx._estimateSize() };
 };
