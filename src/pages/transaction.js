@@ -13,7 +13,7 @@ function Transaction() {
     window.open(url, "_blank");
   };
 
-  const onLoadUtxo = async (addr) => {
+  const onLoadUtxos = async (addr) => {
     const { address, utxos } = await getUtxos(addr);
     if (!address || !utxos) return;
 
@@ -24,6 +24,12 @@ function Transaction() {
         return i;
       })
     );
+  };
+
+  const onRemoveUtxo = async (index, utxos) => {
+    const newutoxs = [...utxos];
+    newutoxs.splice(index, 1);
+    setInputs(newutoxs);
   };
 
   const onGenTx = async (rAddr, sendAmount, utxos) => {
@@ -83,7 +89,7 @@ function Transaction() {
               type="button"
               onClick={(e) => {
                 e.preventDefault();
-                onLoadUtxo(addr);
+                onLoadUtxos(addr);
               }}
             >
               Load
@@ -316,7 +322,7 @@ function Transaction() {
             </div>
 
             <div id="inputs">
-              {inputs.map((input) => (
+              {inputs.map((input, index) => (
                 <div key={input.txid} className="row inputs">
                   <div className="col-xs-5">
                     <input
@@ -354,10 +360,23 @@ function Transaction() {
                     />
                   </div>
                   <div className="col-xs-1">
-                    <a href="!#" className="txidAdd">
+                    <a
+                      href="!#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                      }}
+                      className="txidAdd"
+                    >
                       <span className="glyphicon glyphicon-plus"></span>
                     </a>
-                    <a href="!#" className="txidRemove">
+                    <a
+                      href="!#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onRemoveUtxo(index, inputs);
+                      }}
+                      className="txidRemove"
+                    >
                       <span className="glyphicon glyphicon-minus"></span>
                     </a>
                   </div>
