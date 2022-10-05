@@ -33,7 +33,7 @@ function Layout({ children }) {
           </div>
         </div>{" "}
       </div>
-      <div id="footer">
+      {/* <div id="footer">
         <div className="container text-right">
           <p className="text-muted">
             Donations accepted{" "}
@@ -45,7 +45,7 @@ function Layout({ children }) {
             </a>
           </p>
         </div>
-      </div>
+      </div> */}
 
       <Modals />
     </>
