@@ -1,4 +1,19 @@
+import { useState } from "react";
+import { signTransaction } from "../utils/transaction";
+
 function Sign() {
+  const [signed, setSigned] = useState("");
+  const [tx, setTx] = useState("");
+  const [privKeyWif, setPrivKeyWif] = useState("");
+  const [size, setSize] = useState("");
+
+  const onSign = (key, txHash) => {
+    const { tx, size } = signTransaction(txHash, key);
+
+    setSigned(tx);
+    setSize(size);
+  };
+
   return (
     <div>
       <div className="tab-pane tab-content" id="sign">
@@ -16,9 +31,10 @@ function Sign() {
             <div className="input-group">
               <input
                 id="signPrivateKey"
-                type="password"
+                type="string"
                 className="form-control"
-                value=""
+                value={privKeyWif}
+                onChange={(e) => setPrivKeyWif(e.target.value)}
               />
               <span className="input-group-btn">
                 <button className="showKey btn btn-default" type="button">
@@ -35,12 +51,18 @@ function Sign() {
               type="text"
               id="signTransaction"
               className="form-control"
-              style={{height:"125px"}}
+              style={{ height: "125px" }}
+              value={tx}
+              onChange={(e) => setTx(e.target.value)}
             ></textarea>
           </div>
         </div>
         <br />
-        <a href="!#" id="signAdvancedCollapse">
+        <a
+          href="!#"
+          onClick={(e) => e.preventDefault()}
+          id="signAdvancedCollapse"
+        >
           <div className="well well-sm">
             <span className="glyphicon glyphicon-collapse-down"></span> Advanced
             Options
@@ -105,53 +127,57 @@ function Sign() {
           is a problem with one or more of your inputs, please check and try
           again
         </div>
-        <div className="alert alert-success hidden" id="signedData">
-          <label>Signed transaction</label>
-          <button
-            className="qrcodeBtn btn btn-default"
-            type="button"
-            data-toggle="modal"
-            data-target="#modalQrcode"
-            style={{float:"right"}}
-          >
-            <span className="glyphicon glyphicon-qrcode"></span>
-          </button>
-          <p>The above transaction has been signed:</p>
+        {signed && (
+          <div className="alert alert-success" id="signedData">
+            <label>Signed transaction</label>
+            <button
+              className="qrcodeBtn btn btn-default"
+              type="button"
+              data-toggle="modal"
+              data-target="#modalQrcode"
+              style={{ float: "right" }}
+            >
+              <span className="glyphicon glyphicon-qrcode"></span>
+            </button>
+            <p>The above transaction has been signed:</p>
 
-          <textarea
-            className="form-control script"
-            style={{height:"160px"}}
-            readOnly
-          ></textarea>
+            <textarea
+              className="form-control script"
+              style={{ height: "160px" }}
+              readOnly
+              value={signed}
+            ></textarea>
 
-          <div className="row">
-            <div className="col-md-12">
-              <p className="text-muted" style={{float:"left"}}>
-                Size: <span className="txSize">0</span> <i>bytes</i>
-              </p>
-              <div style={{float:"right", marginTop: "10px"}}>
-                <button className="btn btn-info signedToVerify" type="button">
-                  Verify
-                  <span className="glyphicon glyphicon-ok"></span>
-                  and share
-                </button>
-                Or
-                <button
-                  className="btn btn-info signedToBroadcast"
-                  type="button"
-                >
-                  Broadcast
-                  <span className="glyphicon glyphicon-globe"></span>
-                </button>
+            <div className="row">
+              <div className="col-md-12">
+                <p className="text-muted" style={{ float: "left" }}>
+                  Size: <span className="txSize">{size}</span> <i>bytes</i>
+                </p>
+                <div style={{ float: "right", marginTop: "10px" }}>
+                  <button className="btn btn-info signedToVerify" type="button">
+                    Verify
+                    <span className="glyphicon glyphicon-ok"></span>
+                    and share
+                  </button>
+                  Or
+                  <button
+                    className="btn btn-info signedToBroadcast"
+                    type="button"
+                  >
+                    Broadcast
+                    <span className="glyphicon glyphicon-globe"></span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
         <input
           type="button"
           value="Sign"
           className="btn btn-primary"
           id="signBtn"
+          onClick={() => onSign(privKeyWif, tx)}
         />
         Or
         <input
