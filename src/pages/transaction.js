@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { genAddrScriptHash } from "../utils/addresses";
 import { genTransaction, getUtxos } from "../utils/transaction";
 
 function Transaction() {
@@ -7,6 +6,7 @@ function Transaction() {
   const [amount, setAmount] = useState(0.0);
   const [receiverAddr, setReceiverAddr] = useState("");
   const [inputs, setInputs] = useState([]);
+  const [utxos, setUtxos] = useState([]);
   const [tx, setTx] = useState("");
   const [size, setSize] = useState("");
 
@@ -18,24 +18,23 @@ function Transaction() {
     const { address, utxos } = await getUtxos(addr);
     if (!address || !utxos) return;
 
-    setInputs(
-      utxos.map((i) => {
-        i.scriptPubKey = genAddrScriptHash(address);
-        i.amount = Number(i.amount).toFixed(6);
-        return i;
-      })
-    );
+    setUtxos(utxos);
+    setInputs(utxos);
   };
 
-  const onRemoveUtxo = async (index, utxos) => {
+  const onRemoveUtxo = async (index, inputs, utxos) => {
     const newutoxs = [...utxos];
     newutoxs.splice(index, 1);
-    setInputs(newutoxs);
+    setUtxos(newutoxs);
+
+    const newinputs = [...inputs];
+    newinputs.splice(index, 1);
+    setInputs(newinputs);
   };
 
-  const onGenTx = async (rAddr, sendAmount, utxos) => {
+  const onGenTx = async (rAddr, sendAmount, utxos, sender) => {
     if (!rAddr || !sendAmount || utxos.length < 1) return;
-    const { tx, size } = genTransaction(utxos, rAddr, sendAmount);
+    const { tx, size } = genTransaction(utxos, rAddr, sendAmount, sender);
     setTx(tx);
     setSize(size);
   };
@@ -348,7 +347,7 @@ function Transaction() {
                     <input
                       type="text"
                       className="form-control txIdScript"
-                      value={input.scriptPubKey}
+                      value={input.script}
                       readOnly
                     />
                   </div>
@@ -375,7 +374,7 @@ function Transaction() {
                       href="!#"
                       onClick={(e) => {
                         e.preventDefault();
-                        onRemoveUtxo(index, inputs);
+                        onRemoveUtxo(index, inputs, utxos);
                       }}
                       className="txidRemove"
                     >
@@ -464,7 +463,7 @@ function Transaction() {
           type="button"
           value="Generate"
           onClick={() => {
-            onGenTx(receiverAddr, amount, inputs);
+            onGenTx(receiverAddr, amount, utxos, addr);
           }}
           className="btn btn-primary"
           id="transactionBtn"

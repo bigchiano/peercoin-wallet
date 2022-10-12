@@ -1,5 +1,5 @@
 import bitcore, { PrivateKey, Script, Transaction } from "bitcore-lib";
-import { isValidAddress } from "./addresses";
+import { genAddrScriptHash, isValidAddress } from "./addresses";
 
 bitcore.Networks.defaultNetwork = bitcore.Networks.get("peercoin-testnet");
 const url = "https://tblockbook.peercoin.net";
@@ -45,29 +45,46 @@ export const getUtxos = async (addr) => {
     console.log({ error });
   }
 
-  return { address, utxos: res };
+  const utxos = res.map((i) => {
+    const utxo = {
+      ...i,
+      txId: i.txid,
+      outputIndex: i.vout,
+      address: addr,
+      script: genAddrScriptHash(addr),
+      satoshis: i.satoshis,
+    };
+    return utxo;
+  });
+  return { address, utxos };
 };
 
-export const genTransaction = (utxos, toAddr, amount) => {
+export const genTransaction = (utxos, toAddr, amount, sender) => {
   const tx = new Transaction()
     .from(utxos)
     .to(toAddr, Number((amount * 1000000).toFixed(6)))
-    .change(toAddr);
+    .change(sender);
   return { tx: tx.toString(), size: tx._estimateSize() };
 };
 
-export const signTransaction = (txHash, privKeyWif) => {
-  const tx = new Transaction().addData(txHash).sign(privKeyWif);
+export const signTransaction = (txString, privKeyWif) => {
+  const tx = new Transaction()
+    .addData(new Buffer.from(txString))
+    .sign(privKeyWif);
   return { tx: tx.toString(), size: tx._estimateSize() };
 };
 
 export const brodcastTransaction = async (signedTx) => {
   let res = "";
   try {
-    const req = await fetch(url + "/api/sendrawtransaction?hex=" + signedTx);
-    res = await req.json();
+    const req = await fetch(url + "/api/sendtx/", {
+      method: "post",
+      body: signedTx,
+    });
+    res = (await req.json()).result;
   } catch (error) {
     console.log({ error });
   }
-  return res.backend.bestblockhash;
+
+  return res;
 };

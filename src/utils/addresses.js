@@ -1,12 +1,9 @@
-import {
+import bitcore, {
   Address,
-  HDPrivateKey,
-  Networks,
-  PrivateKey,
+  HDPrivateKey, PrivateKey,
   PublicKey,
-  Script,
+  Script
 } from "bitcore-lib";
-import bitcore from "bitcore-lib";
 
 bitcore.Networks.defaultNetwork = bitcore.Networks.get("peercoin-testnet");
 
@@ -60,7 +57,7 @@ export const genSegWitAddr = (seed = "", bech32 = false) => {
   // bech32 ==> witnesspubkeyhash
   // hash ==> scripthash
   const type = bech32 ? "witnesspubkeyhash" : "scripthash";
-  const address = new Address(publicKey, bitcore.Networks.peercoin, type);
+  const address = new Address(publicKey, undefined, type);
   const scriptBuild = new Script.fromAddress(address);
   let redeemScript = scriptBuild.toHex();
 
@@ -95,6 +92,6 @@ export const genTimeLockAddress = (pubkey, checklocktimeverify) => {
 };
 
 export const isValidAddress = (addr) => {
-  if (Address.isValid(addr, Networks.testnet)) return true;
+  if (Address.isValid(addr, undefined)) return true;
   return false;
 };
